@@ -1,6 +1,7 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const sourcemaps = require('gulp-sourcemaps');
+const browserSync = require('browser-sync').create();
 
 const tsProject = ts.createProject('tsconfig.json');
 
@@ -19,4 +20,17 @@ gulp.task('copy', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', gulp.series(['build', 'copy']));
+gulp.task('watch', function () {
+  gulp.watch('src/**/*.ts', gulp.series('build'));
+  gulp.watch(['src/**/*.html', 'src/**/*.css', 'src/*'], gulp.series('copy', browserSync.reload));
+});
+
+gulp.task('serve', function () {
+  browserSync.init({
+    server: {
+      baseDir: 'dist'
+    }
+  });
+});
+
+gulp.task('dev', gulp.series(['build', 'copy', gulp.parallel('watch', 'serve')]));
