@@ -4,13 +4,6 @@ Ein Programm um Reaktionsgleichungen ausgleichen.
 
 ## Solving a System of Linear Equations using substitution
 
-### Example
-
-$$a \cdot H_2 + b \cdot O_2 \rightarrow c \cdot H_2O$$
-
-$H: 2a + 0b = 2c$  
-$O: 0a + 2b = 1c$
-
 ### Algorythm
 
 1. Invert the coeficients of the product side.
@@ -20,3 +13,31 @@ $O: 0a + 2b = 1c$
 5. Divide all coeficients by the coeficient of the previously chosen one.
 6. Substitute all coeficients of the same variable (inverted) in the other equations
 7. Repeat from **Step 1** 
+
+### Example
+
+$$a \cdot H_2 + b \cdot O_2 \rightarrow c \cdot H_2O$$
+
+---
+
+$H: 2a + 0b = 2c$  
+$O: 0a + 2b = 1c$
+
+---
+
+$H: 2a + 0b - 2c = 0$  
+$O: 0a + 2b - 1c = 0$
+
+---
+
+$$a = \frac{-0b + 2c}{2} = -0b + 1c$$
+
+---
+
+$$0 \cdot (0b - 1c) + 2b - 1c = 0$$
+$$(2b + 0 \cdot 0b) + (-1c + 0 \cdot -1c) = 0$$
+$$2b - 1c = 0$$
+
+---
+
+$$b = \frac{1c}{2} = 0.5c$$
