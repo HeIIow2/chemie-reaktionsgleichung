@@ -1,0 +1,28 @@
+{
+  "name": "chemie-reaktionsgleichung",
+  "version": "1.0.0",
+  "description": "A website, to help you with chemistry reaction equations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HeIIow2/chemie-reaktionsgleichung.git"
+  },
+  "author": "Hellow2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HeIIow2/chemie-reaktionsgleichung/issues"
+  },
+  "homepage": "https://github.com/HeIIow2/chemie-reaktionsgleichung#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "graceful-fs": "^4.2.0"
+  }
+}
