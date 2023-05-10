@@ -224,6 +224,15 @@ class SystemOfEquations:
 
         return max_variable, *sorted_variables
 
+    def is_natural(self, solution: Dict[str, float], factor: int) -> bool:
+        def close_to_natural(n: float) -> bool:
+            return abs(round(n) - n) < 0.00001
+        
+        for key, value in solution.items():
+            if not close_to_natural(value * factor):
+                return False
+        return True
+
     def solve(self):
         """
         Solving the system of linear equations
@@ -236,8 +245,6 @@ class SystemOfEquations:
         # set the first key to 1
         variables = self.get_variables()
         solutions = {variables[0]: 1}
-
-        print(variables)
 
         # substitute back from the one key set
         for variable in variables[1:]:
@@ -260,6 +267,16 @@ class SystemOfEquations:
                     return {}
 
                 solutions[variable] = new_solution
+
+        # find the correct factor:
+        factor = 1
+        for factor in range(1, 2000, 1):
+            if self.is_natural(solutions, factor):
+                break
+        
+        # apply the factor
+        for key in solutions:
+            solutions[key] = round(factor * solutions[key])
 
         return solutions
 
