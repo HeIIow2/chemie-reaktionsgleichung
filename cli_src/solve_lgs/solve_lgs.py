@@ -240,8 +240,11 @@ class SystemOfEquations:
         :return: a dictionary of solutions for the variables
         """
 
-        while not self.is_simplified():
+        iteration = 0
+        while not self.is_simplified() and iteration < 200:
             self.substitute_smallest()
+            
+            iteration += 1
 
         # set the first key to 1
         variables = self.get_variables()
