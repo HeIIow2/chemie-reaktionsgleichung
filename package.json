@@ -4,7 +4,7 @@
   "description": "A website, to help you with chemistry reaction equations",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "live-server --port=3000 ./dist && gulp"
   },
   "repository": {
     "type": "git",
@@ -17,9 +17,12 @@
   },
   "homepage": "https://github.com/HeIIow2/chemie-reaktionsgleichung#readme",
   "devDependencies": {
+    "browser-sync": "^2.29.1",
     "gulp": "^4.0.2",
+    "gulp-connect": "^5.7.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
