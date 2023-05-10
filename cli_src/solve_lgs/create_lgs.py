@@ -225,7 +225,7 @@ class Reaction:
             if current_char == "+":
                 self._add_molecule()
             
-            if current_char == "=":
+            if current_char == "=" or current_char == "→":
                 self._to_product()
             
             if current_char.isdigit():
