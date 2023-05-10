@@ -230,5 +230,5 @@ class Reaction:
     
     
 if __name__ == "__main__":
-    reaction = Reaction("23H + 2O5 = 15H3O6")
+    reaction = Reaction("23Ha1 + 2Oppppp5 = 15Ha3Oppppp61")
     print(reaction)
