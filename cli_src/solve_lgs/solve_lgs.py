@@ -156,6 +156,7 @@ class Equation:
         2a - 2c = 0 -> 2a = 0
         """
         if key not in self.equation:
+            return
             raise KeyError(f"{key} does not exist")
 
         flat_copy = self.equation.copy()
@@ -170,10 +171,7 @@ class Equation:
                 return self
             raise KeyError(f"{substitution.key} does not exist")
 
-        flat_copy = self.equation.copy()
-
-        substitution_equation = substitution.substitute * flat_copy[substitution.key]
-        return self + substitution_equation
+        return self.pop(substitution.key) + (substitution.substitute * self.equation[substitution.key])
 
     def solve_for_first(self) -> Substitution:
         for key, value in self.equation.items():
@@ -204,7 +202,10 @@ class SystemOfEquations:
                 continue
 
             self.equation_list[i] = equation.substitute(to_substitute)
-
+            
+        self.equation_list.remove(smallest_equation)
+        self.equation_list.append(smallest_equation)
+        
     def __repr__(self):
         return self.__str__()
 
