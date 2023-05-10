@@ -16,7 +16,7 @@ gulp.task('build', function () {
 });
 
 gulp.task('copy', function () {
-  return gulp.src(['src/**/*.html', 'src/**/*.css', 'src/*'])
+  return gulp.src(['src/**/*.html', 'src/**/*.css', 'src/*.html'])
     .pipe(gulp.dest('dist'));
 });
 
@@ -29,7 +29,8 @@ gulp.task('serve', function () {
   browserSync.init({
     server: {
       baseDir: 'dist'
-    }
+    },
+    debounceDelay: 1000 // increase delay to 1000ms
   });
 });
 
