@@ -115,12 +115,12 @@ class Atom:
 
 
 class Molecule:
-    def __init__(self, coeficient: int, id_: str) -> None:
-        self.coeficient = coeficient
+    def __init__(self, side: int, id_: str) -> None:
+        self.side = side
+        
+        self.coeficient = 1
         self.id_ = id_
         self.atom_list: List[Atom] = []
-        
-        self.is_educt = coeficient == 1
         
         self.element_set: Set[str] = set()
         self.atom_map: Dict[str, int] = defaultdict(lambda: 0)
@@ -143,14 +143,12 @@ class Molecule:
     def __str__(self) -> str:
         atom_str = "".join(str(atom) for atom in self.atom_list)
         
-        coeficient = self.coeficient if self.is_educt else self.coeficient * -1
-        
-        if coeficient == 0:
+        if self.coeficient == 0:
             return ""
-        if coeficient == 1:
+        if self.coeficient == 1:
             return atom_str
         
-        return str(coeficient) + atom_str
+        return str(self.coeficient) + atom_str
     
     def map_atom(self):
         for atom in self.atom_list:
@@ -159,7 +157,7 @@ class Molecule:
             self.element_set.add(atom.name)
             
     def get_atom_count(self, element: str) -> int:
-        return self.atom_map[element] * self.coeficient
+        return self.atom_map[element] * self.coeficient * self.side
     
 
 
@@ -271,7 +269,8 @@ class Reaction:
         
         solutions = sol.solve()
         
-        print(solutions)
+        for key in solutions:
+            self.id_molecule_map[key].coeficient *= solutions[key]
             
 
     
