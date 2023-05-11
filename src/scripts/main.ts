@@ -2,8 +2,8 @@ import { solve } from "./reaction";
 
 
 const form = document.querySelector('form')!;
-const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-const result = document.querySelector('#result')!;
+const input = document.getElementById('reaktion') as HTMLInputElement;
+const result = document.getElementById('result')!;
 
 console.log("Initializing Solver.");
 

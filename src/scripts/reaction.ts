@@ -213,7 +213,7 @@ class Reaction {
         const solutions = sol.solve();
       
         if (Object.keys(solutions).length === 0) {
-          return "No solution found.";
+          return "No solution found. Sorrryyyy 🥺";
         }
       
         for (const key in solutions) {
@@ -226,7 +226,13 @@ class Reaction {
 
 
 export function solve(reaction: string, showSteps: boolean): string {
-    const parsed_reaction: Reaction = new Reaction(reaction)
-
+    let parsed_reaction: Reaction;
+    
+    try {
+        parsed_reaction = new Reaction(reaction);
+    } catch(ParsingError) {
+        return "Parsing error: Check your input! 🥺"
+    }
+    
     return parsed_reaction.solve(showSteps)
 }
