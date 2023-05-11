@@ -221,6 +221,12 @@ class Reaction {
         }
       
         return this.toString();
-      }
-      
+    }     
+}
+
+
+export function solve(reaction: string, showSteps: boolean): string {
+    const parsed_reaction: Reaction = new Reaction(reaction)
+
+    return parsed_reaction.solve(showSteps)
 }
