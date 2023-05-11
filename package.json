@@ -4,7 +4,7 @@
   "description": "A website, to help you with chemistry reaction equations",
   "main": "index.js",
   "scripts": {
-    "dev": "live-server --port=3000 ./dist && gulp"
+    "dev": "live-server --port=3000 ./src"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "gulp-connect": "^5.7.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "live-server": "^1.1.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
