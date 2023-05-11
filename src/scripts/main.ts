@@ -1,11 +1,14 @@
-const form = document.querySelector('form')!;
-const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-const result = document.querySelector('#result')!;
+import { solve } from "./reaction";
 
-console.log("Hello World");
+
+const form = document.querySelector('form')!;
+const input = document.getElementById('reaktion') as HTMLInputElement;
+const result = document.getElementById('result')!;
+
+console.log("Initializing Solver.");
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  const name = input.value;
-  result.innerHTML = `Hello, ${name}!`;
+  const inputReaction = input.value;
+  result.innerHTML = solve(inputReaction, true);
 });

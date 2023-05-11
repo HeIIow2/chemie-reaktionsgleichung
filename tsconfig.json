@@ -1,13 +1,17 @@
 {
     "compilerOptions": {
       "target": "es5",
-      "module": "commonjs",
+      "module": "ES6",
       "outDir": "./dist",
       "rootDir": "./src",
-      "sourceMap": true
+      "sourceMap": true,
+      "downlevelIteration": true
     },
     "include": [
-      "./src/**/*.ts"
+      "./src/**/*.ts",
+      "./src/*",
+      "./src/**/*",
+      "./src/**/**/*"
     ]
   }
   
