@@ -1,4 +1,4 @@
-import { SystemOfEquations } from './solve';
+import { SystemOfEquations, Equation } from './solve';
 
 const SUBSCRIPT_MAP: {[key: string]: string} = {
     '0': '\u2080',
@@ -71,7 +71,7 @@ class Molecule {
     id: string;
     side: number;
 
-    private elementSet: Set<string> = new Set();
+    elementSet: Set<string> = new Set();
     private atomMap: {[key: string]: number} = defaultDict(0);
 
     constructor(id: string, side: number) {
@@ -174,7 +174,53 @@ class Reaction {
             }
             else if (isAlpha(currentChar) && isUpperCase(currentChar)) this.lastMolecule.addAtom(currentChar);
             else if (isAlpha(currentChar) && isLowerCase(currentChar)) this.lastMolecule.modifyAtomName(currentChar);
-
         }
     }
+
+    getSystemOfLinearEquations(): SystemOfEquations {
+        // Get all existing elements
+        let elementSet: Set<string> = new Set();
+      
+        for (const molecule of this.moleculePool) {
+            molecule.mapAtom();
+      
+            elementSet = new Set([...elementSet, ...molecule.elementSet])
+        }
+      
+        // Create an equation for each element
+        const equations: Equation[] = [];
+      
+        for (const element of elementSet) {
+            const counts: {[id: string]: number} = {};
+        
+            for (const molecule of this.moleculePool) {
+                counts[molecule.id] = molecule.getAtomCount(element);
+            }
+        
+            equations.push(new Equation(counts));
+        }
+      
+        return new SystemOfEquations(equations);
+      }
+      
+      solve(showSteps: boolean): string {
+        const sol = this.getSystemOfLinearEquations();
+      
+        if (showSteps) {
+            console.log(sol);
+        }
+      
+        const solutions = sol.solve();
+      
+        if (Object.keys(solutions).length === 0) {
+          return "No solution found.";
+        }
+      
+        for (const key in solutions) {
+          this.idMoleculeMap[key].coefficient *= solutions[key];
+        }
+      
+        return this.toString();
+      }
+      
 }

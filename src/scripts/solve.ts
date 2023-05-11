@@ -29,7 +29,7 @@ class Substitution {
 }
 
 
-class Equation {
+export class Equation {
     equation: { [key: string]: number };
 
     constructor(equation: { [key: string]: number }) {
