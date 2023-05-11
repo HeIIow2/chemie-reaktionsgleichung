@@ -8,10 +8,7 @@
       "downlevelIteration": true
     },
     "include": [
-      "./src/**/*.ts",
-      "./src/*",
-      "./src/**/*",
-      "./src/**/**/*"
+      "./src/**/*.ts"
     ]
   }
   

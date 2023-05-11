@@ -1,4 +1,4 @@
-import { solve } from "./reaction";
+import { solve } from "./reaction.js";
 
 
 const form = document.querySelector('form')!;
@@ -9,6 +9,8 @@ console.log("Initializing Solver.");
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
+
   const inputReaction = input.value;
+  console.log(inputReaction)
   result.innerHTML = solve(inputReaction, true);
 });

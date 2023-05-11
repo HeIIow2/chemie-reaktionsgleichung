@@ -13,16 +13,18 @@ class Substitution {
           .join(" + ")}`;
     }
     
-    newSolution(current_solution: { [key: string]: number }): number | null {
+    newSolution(current_solution: { [key: string]: number }): number | undefined {
         let possible_solution = 0;
 
         for (const [key, value] of Object.entries(this.substitute.equation)) {
             if (!(key in current_solution)) {
-            return null;
+            return undefined;
             }
 
             possible_solution += value * current_solution[key];
         }
+
+        if (possible_solution === 0) return undefined
 
         return possible_solution;
     }
@@ -197,17 +199,17 @@ export class SystemOfEquations {
         this.equationList.push(smallestEquation);
       }
     
-      getVariables(): string[] {
-        const variable_frequencies: {[key: string]: number} = {};
-    
-        for (const equation of this.equationList) {
-            for (const variable in equation.equation) {
-                variable_frequencies[variable] = (variable_frequencies[variable] || 0) + 1;
-            }
+    getVariables(): string[] {
+    const variable_frequencies: {[key: string]: number} = {};
+
+    for (const equation of this.equationList) {
+        for (const variable in equation.equation) {
+            variable_frequencies[variable] = (variable_frequencies[variable] || 0) + 1;
         }
-    
-        return Object.keys(variable_frequencies).sort((a, b) => variable_frequencies[b] - variable_frequencies[a]);
-      }
+    }
+
+    return Object.keys(variable_frequencies).sort((a, b) => variable_frequencies[b] - variable_frequencies[a]);
+    }
     
     isNatural(solution: {[key: string]: number}, factor: number): boolean {
         const close_to_natural = (n: number) => Math.abs(Math.round(n) - n) < 0.00001;
@@ -248,11 +250,11 @@ export class SystemOfEquations {
                 const substitution = equationWithVar.solve(variable);
 
                 const newSolution = substitution.newSolution(solutions);
-                if (newSolution === null) {
+                if (newSolution === undefined) {
                     continue;
                 }
 
-                if (existingSolution !== null && newSolution !== existingSolution) {
+                if (existingSolution !== undefined && newSolution !== existingSolution) {
                     return {};
                 }
 

@@ -1,4 +1,4 @@
-import {Equation, SystemOfEquations} from './solveLgs';
+import {Equation, SystemOfEquations} from './solveLgs.js';
 
 const SUBSCRIPT_MAP: {[key: string]: string} = {
     '0': '\u2080',
@@ -33,6 +33,10 @@ function isLowerCase(str: string) {
   
 function isAlpha(str: string) {
     return /^[a-zA-Z]+$/.test(str);
+}
+
+function isDigit(str: string): boolean {
+    return /^[0-9]+$/.test(str);
 }
 
 
@@ -85,7 +89,7 @@ class Molecule {
         const atomString = this.atomList.map(atom => atom.toString()).join("");
 
         if (this.coefficient === 1) return atomString;
-        else this.coefficient.toString() + atomString;
+        else return this.coefficient.toString() + atomString;
     }
 
     setCoeficient(coefficient: number): void {
@@ -117,14 +121,14 @@ class Molecule {
 }
 
 class Reaction {
-    educt: Molecule[];
-    product: Molecule[];
+    educt: Molecule[] = [];
+    product: Molecule[] = [];
 
     private lastMolecule: Molecule;
     private currentSide: number = 1;
 
-    private moleculePool: Molecule[];
-    private idMoleculeMap: {[key: string]: Molecule}
+    private moleculePool: Molecule[] = [];
+    private idMoleculeMap: {[key: string]: Molecule} = {}
 
     constructor(reaction: string) {
         this.parse(reaction);
@@ -163,11 +167,12 @@ class Reaction {
             const nextChar: string = reaction[i + 1];
 
             if (currentChar === " ") continue;
-            if (currentChar === "+") this.switchToProduct();
-            else if (!isNaN(Number(currentChar))) {
+            if (currentChar === "+") this.addMolecule();
+            else if (currentChar === "=") this.switchToProduct();
+            else if (isDigit(currentChar)) {
                 lastNumber += currentChar;
 
-                if (isNaN(Number(nextChar))) {
+                if (!isDigit(nextChar)) {
                     this.lastMolecule.setCoeficient(Number(lastNumber));
                     lastNumber = "";
                 }
@@ -207,7 +212,7 @@ class Reaction {
         const sol = this.getSystemOfLinearEquations();
       
         if (showSteps) {
-            console.log(sol);
+            console.log(sol.toString());
         }
       
         const solutions = sol.solve();
@@ -230,8 +235,11 @@ export function solve(reaction: string, showSteps: boolean): string {
     
     try {
         parsed_reaction = new Reaction(reaction);
-    } catch(ParsingError) {
-        return "Parsing error: Check your input! 🥺"
+    } catch(error) {
+        console.error(error);
+        if (error instanceof ParsingError) {
+            return "Parsing error: Check your input! 🥺";
+        }
     }
     
     return parsed_reaction.solve(showSteps)
