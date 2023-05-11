@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Roboto'), local('Roboto-Regular'), url(images/roboto-medium.woff2) format('woff2');
+}
+
 /* Define colors with semantic names */
 :root {
     --primary-color: #ff69b4;
@@ -10,6 +17,12 @@
     /* darker pink on hover */
     --button-click-color: #d1466c;
     /* even darker pink on click */
+
+    --padding: 20px;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 /* Use semantic colors in styles */
@@ -18,11 +31,34 @@ body {
     color: var(--text-color);
 }
 
+
+
+label, h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    /* Add margin-bottom to give space between label and input */
+    color: var(--primary-color);
+} 
+
+
+button[type="submit"]:hover {
+    background-color: var(--button-hover-color);
+}
+
+button[type="submit"]:active {
+    background-color: var(--button-click-color);
+}
+
+
 form {
+    margin-top: 50px;
+
+    width: 100%;
+    padding-left: var(--padding);
+    padding-right: var(--padding);
+
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin-top: 50px;
 }
 
 .row {
@@ -32,29 +68,20 @@ form {
     flex-direction: row;
 }
 
-label {
-    font-size: 20px;
-    margin-bottom: 10px;
-    /* Add margin-bottom to give space between label and input */
-    color: var(--primary-color);
-} 
-
 input[type="text"] {
     width: 100%;
     padding: 10px;
     font-size: 16px;
-    margin-right: 10px;
     margin-bottom: 10px;
     /* Add margin-bottom to give space between input and button */
     border: none;
     border-bottom: 2px solid var(--primary-color);
     background-color: transparent;
     color: var(--text-color);
-}
 
-
-input[type="text"]:focus {
     outline: none;
+
+    margin-right: 10px;
 }
 
 button[type="submit"] {
@@ -65,18 +92,15 @@ button[type="submit"] {
     border-radius: 5px;
     font-size: 18px;
     cursor: pointer;
-}
+} 
 
-button[type="submit"]:hover {
-    background-color: var(--button-hover-color);
-}
-
-button[type="submit"]:active {
-    background-color: var(--button-click-color);
-}
 
 @media (max-width: 768px) {
     form {
+        flex-direction: column;
+    }
+
+    .row {
         flex-direction: column;
     }
 
@@ -86,16 +110,21 @@ button[type="submit"]:active {
     }
 }
 
+.result-container {
+    margin-top: 10vh;
 
-form {
-    display: flex;
-    flex-direction: row;
+    padding-left: var(--padding);
 }
 
-input[type="text"],
-button[type="submit"] {
-    flex: 1;
-} 
+#result {
+    text-align: left;
+
+    font-family: 'Roboto';
+    font-size: 30px;
+    margin-bottom: 10px;
+    /* Add margin-bottom to give space between label and input */
+    color: var(--primary-color);
+}
 
 div.image {
     position: fixed;
