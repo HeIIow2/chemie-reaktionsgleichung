@@ -161,7 +161,7 @@ class Equation {
     }
 }
 
-class SystemOfEquations {
+export class SystemOfEquations {
     equationList: Equation[]
 
     constructor(equationList: Equation[]) {
