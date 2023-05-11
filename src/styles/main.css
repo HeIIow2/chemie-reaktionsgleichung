@@ -96,3 +96,10 @@ input[type="text"],
 button[type="submit"] {
     flex: 1;
 } 
+
+div.image {
+    position: fixed;
+    right: 0px;
+    bottom: -5px;
+    z-index: -1;
+}
