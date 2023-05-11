@@ -13,11 +13,26 @@ const SUBSCRIPT_MAP: {[key: string]: string} = {
     '9': '\u2089',
 };
 
+const ID_LIST: string = "abcdefghijklmnopqrstuvwxyz^"
+
 
 function defaultDict(defaultValue: any) {
     return new Proxy({}, {
       get: (target, name) => name in target ? target[name] : defaultValue
     });
+}
+
+
+function isUpperCase(str: string) {
+    return str === str.toUpperCase();
+}
+
+function isLowerCase(str: string) {
+    return str === str.toLowerCase();
+}
+  
+function isAlpha(str: string) {
+    return /^[a-zA-Z]+$/.test(str);
 }
 
 
@@ -99,4 +114,67 @@ class Molecule {
         return this.atomMap[element] * this.coefficient * this.side;
     }
 
+}
+
+class Reaction {
+    educt: Molecule[];
+    product: Molecule[];
+
+    private lastMolecule: Molecule;
+    private currentSide: number = 1;
+
+    private moleculePool: Molecule[];
+    private idMoleculeMap: {[key: string]: Molecule}
+
+    constructor(reaction: string) {
+        this.parse(reaction);
+    }
+
+    toString(): string {
+        return this.educt.map(molecule => molecule.toString()).join(" + ") + " ⟶ " + this.product.map(molecule => molecule.toString()).join(" + ")
+    }
+
+    private switchToProduct(): void {
+        if (this.currentSide === -1) throw ParsingError;
+
+        this.currentSide = -1;
+        this.addMolecule();
+    }
+
+    private addMolecule(): void {
+        this.lastMolecule = new Molecule(ID_LIST[this.moleculePool.length], this.currentSide);
+
+        this.moleculePool.push(this.lastMolecule);
+        this.idMoleculeMap[this.lastMolecule.id] = this.lastMolecule;
+
+        if (this.currentSide === 1) this.educt.push(this.lastMolecule);
+        else if (this.currentSide === -1) this.product.push(this.lastMolecule);
+        else throw ParsingError;
+    }
+
+    private parse(reaction: string): void {
+        this.addMolecule();
+
+        reaction += " ";
+        let lastNumber: string = "";
+
+        for (let i = 0; i<reaction.length-1; i++) {
+            const currentChar: string = reaction[i];
+            const nextChar: string = reaction[i + 1];
+
+            if (currentChar === " ") continue;
+            if (currentChar === "+") this.switchToProduct();
+            else if (!isNaN(Number(currentChar))) {
+                lastNumber += currentChar;
+
+                if (isNaN(Number(nextChar))) {
+                    this.lastMolecule.setCoeficient(Number(lastNumber));
+                    lastNumber = "";
+                }
+            }
+            else if (isAlpha(currentChar) && isUpperCase(currentChar)) this.lastMolecule.addAtom(currentChar);
+            else if (isAlpha(currentChar) && isLowerCase(currentChar)) this.lastMolecule.modifyAtomName(currentChar);
+
+        }
+    }
 }
