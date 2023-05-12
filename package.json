@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
-    "start": "npm run build && browser-sync start --server \"dist\""
+    "start": "npm run build && browser-sync start --server \"dist\"",
+    "style": "browser-sync start --server \"src\""
   },
   "repository": {
     "type": "git",
@@ -21,10 +22,6 @@
   "devDependencies": {
     "browser-sync": "^2.29.1",
     "esm": "^3.2.25",
-    "gulp": "^4.0.2",
-    "gulp-connect": "^5.7.0",
-    "gulp-sourcemaps": "^3.0.0",
-    "gulp-typescript": "^6.0.0-alpha.1",
     "live-server": "^1.1.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
