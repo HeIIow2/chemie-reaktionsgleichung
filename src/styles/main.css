@@ -19,6 +19,7 @@
     /* even darker pink on click */
 
     --padding: 20px;
+    --font-size: 27px;
 }
 
 * {
@@ -90,7 +91,7 @@ button[type="submit"] {
     color: var(--text-color);
     border: none;
     border-radius: 5px;
-    font-size: 18px;
+    font-size: var(--font-size);
     cursor: pointer;
 } 
 
@@ -120,7 +121,7 @@ button[type="submit"] {
     text-align: left;
 
     font-family: 'Roboto';
-    font-size: 30px;
+    font-size: var(--font-size);
     margin-bottom: 10px;
     /* Add margin-bottom to give space between label and input */
     color: var(--primary-color);
