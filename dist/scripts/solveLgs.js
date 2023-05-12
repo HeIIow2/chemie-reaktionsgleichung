@@ -275,49 +275,56 @@ var SystemOfEquations = /** @class */ (function () {
             this.substituteSmallest();
             iteration++;
         }
-        // set the first key to 1
-        var variables = this.getVariables();
-        var solutions = (_a = {}, _a[variables[0]] = 1, _a);
-        try {
-            // substitute back from the one key set
-            for (var _d = __values(variables.slice(1)), _e = _d.next(); !_e.done; _e = _d.next()) {
-                var variable = _e.value;
-                // Choose a variable to set to 1
-                var equations = this.equationList.slice();
-                try {
-                    for (var equations_1 = (e_7 = void 0, __values(equations)), equations_1_1 = equations_1.next(); !equations_1_1.done; equations_1_1 = equations_1.next()) {
-                        var equationWithVar = equations_1_1.value;
-                        if (!(variable in equationWithVar.equation)) {
-                            continue;
-                        }
-                        var existingSolution = solutions[variable];
-                        // Solve for that variable in one of the equations
-                        var substitution = equationWithVar.solve(variable);
-                        var newSolution = substitution.newSolution(solutions);
-                        if (newSolution === undefined) {
-                            continue;
-                        }
-                        if (existingSolution !== undefined && newSolution !== existingSolution) {
-                            return {};
-                        }
-                        solutions[variable] = newSolution;
-                    }
-                }
-                catch (e_7_1) { e_7 = { error: e_7_1 }; }
-                finally {
-                    try {
-                        if (equations_1_1 && !equations_1_1.done && (_c = equations_1.return)) _c.call(equations_1);
-                    }
-                    finally { if (e_7) throw e_7.error; }
-                }
-            }
-        }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
-        finally {
+        var solutions = {};
+        for (var n = 0; n < this.getVariables().length; n++) {
+            // set the first key to 1
+            var variables = this.getVariables();
+            solutions = (_a = {}, _a[variables[0]] = 1, _a);
             try {
-                if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
+                // substitute back from the one key set
+                for (var _d = (e_6 = void 0, __values(variables.slice(1))), _e = _d.next(); !_e.done; _e = _d.next()) {
+                    var variable = _e.value;
+                    // Choose a variable to set to 1
+                    var equations = this.equationList.slice();
+                    try {
+                        for (var _f = (e_7 = void 0, __values(equations.slice())), _g = _f.next(); !_g.done; _g = _f.next()) {
+                            var equationWithVar = _g.value;
+                            if (!(variable in equationWithVar.equation)) {
+                                continue;
+                            }
+                            var existingSolution = solutions[variable];
+                            // Solve for that variable in one of the equations
+                            var substitution = equationWithVar.solve(variable);
+                            var newSolution = substitution.newSolution(solutions);
+                            if (newSolution === undefined) {
+                                continue;
+                            }
+                            if (existingSolution !== undefined && newSolution !== existingSolution) {
+                                return {};
+                            }
+                            var index = this.equationList.indexOf(equationWithVar);
+                            if (index > -1) {
+                                this.equationList.splice(index, 1);
+                            }
+                            solutions[variable] = newSolution;
+                        }
+                    }
+                    catch (e_7_1) { e_7 = { error: e_7_1 }; }
+                    finally {
+                        try {
+                            if (_g && !_g.done && (_c = _f.return)) _c.call(_f);
+                        }
+                        finally { if (e_7) throw e_7.error; }
+                    }
+                }
             }
-            finally { if (e_6) throw e_6.error; }
+            catch (e_6_1) { e_6 = { error: e_6_1 }; }
+            finally {
+                try {
+                    if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
+                }
+                finally { if (e_6) throw e_6.error; }
+            }
         }
         // find the correct factor
         var factor = 1;

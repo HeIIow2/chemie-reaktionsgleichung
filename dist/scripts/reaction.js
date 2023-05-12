@@ -13,17 +13,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -39,6 +28,17 @@ var __read = (this && this.__read) || function (o, n) {
         finally { if (e) throw e.error; }
     }
     return ar;
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
@@ -62,6 +62,10 @@ var SUBSCRIPT_MAP = {
     '8': '\u2088',
     '9': '\u2089',
 };
+var UN_SUBSCRIPT_MAP = Object.fromEntries(Object.entries(SUBSCRIPT_MAP).map(function (_a) {
+    var _b = __read(_a, 2), key = _b[0], value = _b[1];
+    return [value, key];
+}));
 var ID_LIST = "abcdefghijklmnopqrstuvwxyz^";
 function defaultDict(defaultValue) {
     return new Proxy({}, {
@@ -78,7 +82,7 @@ function isAlpha(str) {
     return /^[a-zA-Z]+$/.test(str);
 }
 function isDigit(str) {
-    return /^[0-9]+$/.test(str);
+    return /^[0-9\u2080-\u2089]+$/.test(str);
 }
 var ParsingError = /** @class */ (function (_super) {
     __extends(ParsingError, _super);
@@ -110,14 +114,22 @@ var Solution = /** @class */ (function () {
 }());
 var Atom = /** @class */ (function () {
     function Atom(name, count) {
+        this.oldCount = 0;
         this.name = name;
         this.count = count;
     }
+    Atom.prototype.setCount = function (count, isNew) {
+        if (isNew === void 0) { isNew = false; }
+        if (isNew) {
+            this.oldCount = this.count;
+        }
+        this.count = this.oldCount + count;
+    };
     Atom.prototype.toString = function () {
-        if (this.count === 0)
-            return "";
         if (this.count === 1)
             return this.name;
+        if (this.count === 0)
+            return "";
         var subscript = "";
         var count_str = this.count.toString();
         for (var i = 0; i < count_str.length; i++) {
@@ -131,6 +143,7 @@ var Molecule = /** @class */ (function () {
     function Molecule(id, side) {
         this.coefficient = 1;
         this.atomList = [];
+        this.printableAtomList = [];
         this.elementSet = new Set();
         this.atomMap = defaultDict(0);
         this.id = id;
@@ -149,22 +162,32 @@ var Molecule = /** @class */ (function () {
         if (this.atomList.length === 0)
             this.coefficient *= coefficient;
         else
-            this.atomList[this.atomList.length - 1].count = coefficient;
+            this.printableAtomList[this.printableAtomList.length - 1].setCount(coefficient);
     };
     Molecule.prototype.addAtom = function (name) {
-        this.atomList.push(new Atom(name, 1));
+        this.mapAtom();
+        var newAtom;
+        if (name in this.atomMap) {
+            newAtom = this.atomMap[name];
+            newAtom.setCount(1, true);
+        }
+        else {
+            newAtom = new Atom(name, 1);
+            this.atomList.push(newAtom);
+        }
+        this.printableAtomList.push(newAtom);
     };
     Molecule.prototype.modifyAtomName = function (name) {
         if (this.atomList.length === 0)
             throw ParsingError;
-        this.atomList[this.atomList.length - 1].name += name;
+        this.printableAtomList[this.printableAtomList.length - 1].name += name;
     };
     Molecule.prototype.mapAtom = function () {
         var e_1, _a;
         try {
             for (var _b = __values(this.atomList), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var atom = _c.value;
-                this.atomMap[atom.name] = atom.count;
+                this.atomMap[atom.name] = atom;
                 this.elementSet.add(atom.name);
             }
         }
@@ -177,7 +200,9 @@ var Molecule = /** @class */ (function () {
         }
     };
     Molecule.prototype.getAtomCount = function (element) {
-        return this.atomMap[element] * this.coefficient * this.side;
+        if (!(element in this.atomMap))
+            return 0;
+        return this.atomMap[element].count * this.coefficient * this.side;
     };
     return Molecule;
 }());
@@ -217,6 +242,7 @@ var Reaction = /** @class */ (function () {
         this.addMolecule();
         reaction += " ";
         var lastNumber = "";
+        var lastAtomName = "";
         for (var i = 0; i < reaction.length - 1; i++) {
             var currentChar = reaction[i];
             var nextChar = reaction[i + 1];
@@ -224,19 +250,25 @@ var Reaction = /** @class */ (function () {
                 continue;
             if (currentChar === "+")
                 this.addMolecule();
-            else if (currentChar === "=")
+            else if (currentChar === "=" || currentChar === "⟶")
                 this.switchToProduct();
             else if (isDigit(currentChar)) {
-                lastNumber += currentChar;
+                var digit = currentChar;
+                if (currentChar in UN_SUBSCRIPT_MAP)
+                    digit = UN_SUBSCRIPT_MAP[currentChar];
+                lastNumber += digit;
                 if (!isDigit(nextChar)) {
                     this.lastMolecule.setCoeficient(Number(lastNumber));
                     lastNumber = "";
                 }
             }
-            else if (isAlpha(currentChar) && isUpperCase(currentChar))
-                this.lastMolecule.addAtom(currentChar);
-            else if (isAlpha(currentChar) && isLowerCase(currentChar))
-                this.lastMolecule.modifyAtomName(currentChar);
+            else if (isAlpha(currentChar)) {
+                lastAtomName += currentChar;
+                if (!(isAlpha(nextChar) && isLowerCase(nextChar))) {
+                    this.lastMolecule.addAtom(lastAtomName);
+                    lastAtomName = "";
+                }
+            }
         }
         this.originalReaction = this.toString();
     };
@@ -324,7 +356,7 @@ var Reaction = /** @class */ (function () {
 }());
 export function solve(reaction, showSteps) {
     var parsed_reaction = new Reaction(reaction);
-    return parsed_reaction.solve(showSteps).toString();
+    return parsed_reaction.solve(showSteps);
 }
 function testSolving() {
     var e_6, _a;
@@ -341,7 +373,8 @@ function testSolving() {
         "C8H18 + O2 = CO2 + H2O",
         "C3H8O3 + HNO3 = CH3NO3 + CH3COOH + H2O",
         "C6H5CH3 + KMnO4 = CO2 + H2O + MnO2 + KCl",
-        "C6H5CH3 + Br2 = C6H5CHBr2 + HBr"
+        "C6H5CH3 + Br2 = C6H5CHBr2 + HBr",
+        "C₇H₈ + Br₂ ⟶ C₇H₆Br₂ + HBr"
     ];
     try {
         for (var cases_1 = __values(cases), cases_1_1 = cases_1.next(); !cases_1_1.done; cases_1_1 = cases_1.next()) {
@@ -361,5 +394,5 @@ function testSolving() {
         finally { if (e_6) throw e_6.error; }
     }
 }
-testSolving();
+// testSolving();
 //# sourceMappingURL=reaction.js.map

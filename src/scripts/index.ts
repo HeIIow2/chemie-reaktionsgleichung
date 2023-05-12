@@ -12,5 +12,9 @@ form.addEventListener('submit', (event) => {
 
   const inputReaction = input.value;
   console.log(inputReaction)
-  result.innerHTML = solve(inputReaction, true);
+
+  let solution = solve(inputReaction, true)
+
+  result.innerHTML = solution.toString();
+  input.value = solution.originalReaction();
 });

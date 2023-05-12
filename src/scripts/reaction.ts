@@ -12,6 +12,7 @@ const SUBSCRIPT_MAP: {[key: string]: string} = {
     '8': '\u2088',
     '9': '\u2089',
 };
+const UN_SUBSCRIPT_MAP = Object.fromEntries(Object.entries(SUBSCRIPT_MAP).map(([key, value]) => [value, key]));
 
 const ID_LIST: string = "abcdefghijklmnopqrstuvwxyz^"
 
@@ -36,7 +37,7 @@ function isAlpha(str: string) {
 }
 
 function isDigit(str: string): boolean {
-    return /^[0-9]+$/.test(str);
+    return /^[0-9\u2080-\u2089]+$/.test(str);
 }
 
 
@@ -76,14 +77,25 @@ class Atom {
     name: string;
     count: number
 
+    oldCount: number = 0;
+
     constructor(name: string, count: number) {
         this.name = name;
         this.count = count;
     }
 
+    setCount(count: number, isNew: boolean = false): void {
+        if (isNew) {
+            this.oldCount = this.count;
+        }
+
+        this.count = this.oldCount + count;
+    }
+
     toString(): string {
-        if (this.count === 0) return "";
         if (this.count === 1) return this.name;
+        if (this.count === 0) return "";
+        
 
         let subscript = "";
         const count_str = this.count.toString();
@@ -101,11 +113,13 @@ class Molecule {
     coefficient: number = 1;
     atomList: Atom[] = [];
 
+    printableAtomList: Atom[] = []
+
     id: string;
     side: number;
 
     elementSet: Set<string> = new Set();
-    private atomMap: {[key: string]: number} = defaultDict(0);
+    private atomMap: {[key: string]: Atom} = defaultDict(0);
 
     constructor(id: string, side: number) {
         this.id = id;
@@ -123,28 +137,41 @@ class Molecule {
 
     setCoeficient(coefficient: number): void {
         if (this.atomList.length === 0) this.coefficient *= coefficient;
-        else this.atomList[this.atomList.length - 1].count = coefficient;
+        else this.printableAtomList[this.printableAtomList.length - 1].setCount(coefficient);
     }
 
     addAtom(name: string): void {
-        this.atomList.push(new Atom(name, 1));
+        this.mapAtom();
+
+        let newAtom: Atom;
+
+        if (name in this.atomMap) {
+            newAtom = this.atomMap[name];
+            newAtom.setCount(1, true)
+        } else {
+            newAtom = new Atom(name, 1);
+            this.atomList.push(newAtom);
+        }
+
+        this.printableAtomList.push(newAtom);
     }
 
     modifyAtomName(name: string): void {
         if (this.atomList.length === 0) throw ParsingError;
 
-        this.atomList[this.atomList.length - 1].name += name
+        this.printableAtomList[this.printableAtomList.length - 1].name += name
     }
 
     mapAtom(): void {
         for (const atom of this.atomList) {
-            this.atomMap[atom.name] = atom.count;
+            this.atomMap[atom.name] = atom;
             this.elementSet.add(atom.name);
         }
     }
 
     getAtomCount(element: string): number {
-        return this.atomMap[element] * this.coefficient * this.side;
+        if (!(element in this.atomMap)) return 0;
+        return this.atomMap[element].count * this.coefficient * this.side;
     }
 
 }
@@ -197,6 +224,7 @@ class Reaction {
 
         reaction += " ";
         let lastNumber: string = "";
+        let lastAtomName: string = "";
 
         for (let i = 0; i<reaction.length-1; i++) {
             const currentChar: string = reaction[i];
@@ -204,17 +232,27 @@ class Reaction {
 
             if (currentChar === " ") continue;
             if (currentChar === "+") this.addMolecule();
-            else if (currentChar === "=") this.switchToProduct();
+            else if (currentChar === "=" || currentChar === "⟶") this.switchToProduct();
+
             else if (isDigit(currentChar)) {
-                lastNumber += currentChar;
+                let digit: string = currentChar
+                if (currentChar in UN_SUBSCRIPT_MAP) digit = UN_SUBSCRIPT_MAP[currentChar];
+                lastNumber += digit;
 
                 if (!isDigit(nextChar)) {
                     this.lastMolecule.setCoeficient(Number(lastNumber));
                     lastNumber = "";
                 }
             }
-            else if (isAlpha(currentChar) && isUpperCase(currentChar)) this.lastMolecule.addAtom(currentChar);
-            else if (isAlpha(currentChar) && isLowerCase(currentChar)) this.lastMolecule.modifyAtomName(currentChar);
+
+            else if (isAlpha(currentChar)) {
+                lastAtomName += currentChar;
+
+                if (!(isAlpha(nextChar) && isLowerCase(nextChar))) {
+                    this.lastMolecule.addAtom(lastAtomName);
+                    lastAtomName = "";
+                }
+            }
         }
 
         this.originalReaction = this.toString();
@@ -276,9 +314,9 @@ class Reaction {
 }
 
 
-export function solve(reaction: string, showSteps: boolean): string {
+export function solve(reaction: string, showSteps: boolean): Solution {
     let parsed_reaction: Reaction = new Reaction(reaction);
-    return parsed_reaction.solve(showSteps).toString();
+    return parsed_reaction.solve(showSteps);
 }
 
 function testSolving() {
@@ -295,7 +333,8 @@ function testSolving() {
         "C8H18 + O2 = CO2 + H2O",
         "C3H8O3 + HNO3 = CH3NO3 + CH3COOH + H2O",
         "C6H5CH3 + KMnO4 = CO2 + H2O + MnO2 + KCl",
-        "C6H5CH3 + Br2 = C6H5CHBr2 + HBr"
+        "C6H5CH3 + Br2 = C6H5CHBr2 + HBr",
+        "C₇H₈ + Br₂ ⟶ C₇H₆Br₂ + HBr"
     ]
 
     for (const reaction of cases) {
@@ -307,4 +346,4 @@ function testSolving() {
     }
 }
 
-testSolving();
+// testSolving();

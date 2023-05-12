@@ -5,7 +5,8 @@
   "main": "dist/scripts/runStuff.js",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc -p .",
+    "start": "npm run build && browser-sync start --server --directory --files \"dist/*\""
   },
   "repository": {
     "type": "git",

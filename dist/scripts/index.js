@@ -7,6 +7,8 @@ form.addEventListener('submit', function (event) {
     event.preventDefault();
     var inputReaction = input.value;
     console.log(inputReaction);
-    result.innerHTML = solve(inputReaction, true);
+    var solution = solve(inputReaction, true);
+    result.innerHTML = solution.toString();
+    input.value = solution.originalReaction();
 });
 //# sourceMappingURL=index.js.map

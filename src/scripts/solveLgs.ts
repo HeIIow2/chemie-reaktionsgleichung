@@ -230,35 +230,43 @@ export class SystemOfEquations {
             iteration++;
         }
 
-        // set the first key to 1
-        const variables = this.getVariables();
-        const solutions: {[key: string]: number} = {[variables[0]]: 1};
+        let solutions: {[key: string]: number} = {};
 
-        // substitute back from the one key set
-        for (const variable of variables.slice(1)) {
-            // Choose a variable to set to 1
-            const equations = this.equationList.slice();
-            
-            for (const equationWithVar of equations) {
-                if (!(variable in equationWithVar.equation)) {
-                    continue;
+        for (let n = 0; n < this.getVariables().length; n++) {
+            // set the first key to 1
+            const variables = this.getVariables();
+            solutions = {[variables[0]]: 1};
+
+            // substitute back from the one key set
+            for (const variable of variables.slice(1)) {
+                // Choose a variable to set to 1
+                const equations = this.equationList.slice();
+                
+                for (const equationWithVar of equations.slice()) {
+                    if (!(variable in equationWithVar.equation)) {
+                        continue;
+                    }
+
+                    const existingSolution = solutions[variable];
+
+                    // Solve for that variable in one of the equations
+                    const substitution = equationWithVar.solve(variable);
+
+                    const newSolution = substitution.newSolution(solutions);
+                    if (newSolution === undefined) {
+                        continue;
+                    }
+
+                    if (existingSolution !== undefined && newSolution !== existingSolution) {
+                        return {};
+                    }
+
+                    let index = this.equationList.indexOf(equationWithVar);
+                    if (index > -1) {
+                        this.equationList.splice(index, 1);
+                    }
+                    solutions[variable] = newSolution;
                 }
-
-                const existingSolution = solutions[variable];
-
-                // Solve for that variable in one of the equations
-                const substitution = equationWithVar.solve(variable);
-
-                const newSolution = substitution.newSolution(solutions);
-                if (newSolution === undefined) {
-                    continue;
-                }
-
-                if (existingSolution !== undefined && newSolution !== existingSolution) {
-                    return {};
-                }
-
-                solutions[variable] = newSolution;
             }
         }
 
