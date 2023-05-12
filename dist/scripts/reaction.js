@@ -87,6 +87,27 @@ var ParsingError = /** @class */ (function (_super) {
     }
     return ParsingError;
 }(Error));
+var Solution = /** @class */ (function () {
+    function Solution(reaction, parsingError, hasNoSollution) {
+        this.reaction = reaction;
+        this.parsingError = parsingError;
+        this.hasNoSollution = hasNoSollution;
+    }
+    Solution.prototype.toString = function () {
+        if (this.parsingError)
+            return "Maybe check your input(?) 🥺";
+        if (this.hasNoSollution)
+            return "No solution found. I'm soooooryyyy!! 🥺";
+        return this.reaction.toString();
+    };
+    Solution.prototype.isSucess = function () {
+        return !this.parsingError && !this.hasNoSollution;
+    };
+    Solution.prototype.originalReaction = function () {
+        return this.reaction.originalReaction;
+    };
+    return Solution;
+}());
 var Atom = /** @class */ (function () {
     function Atom(name, count) {
         this.name = name;
@@ -167,14 +188,17 @@ var Reaction = /** @class */ (function () {
         this.currentSide = 1;
         this.moleculePool = [];
         this.idMoleculeMap = {};
+        this.parsingError = false;
         this.parse(reaction);
     }
     Reaction.prototype.toString = function () {
         return this.educt.map(function (molecule) { return molecule.toString(); }).join(" + ") + " ⟶ " + this.product.map(function (molecule) { return molecule.toString(); }).join(" + ");
     };
     Reaction.prototype.switchToProduct = function () {
-        if (this.currentSide === -1)
-            throw ParsingError;
+        if (this.currentSide === -1) {
+            this.parsingError = true;
+            return;
+        }
         this.currentSide = -1;
         this.addMolecule();
     };
@@ -187,7 +211,7 @@ var Reaction = /** @class */ (function () {
         else if (this.currentSide === -1)
             this.product.push(this.lastMolecule);
         else
-            throw ParsingError;
+            this.parsingError = true;
     };
     Reaction.prototype.parse = function (reaction) {
         this.addMolecule();
@@ -214,6 +238,7 @@ var Reaction = /** @class */ (function () {
             else if (isAlpha(currentChar) && isLowerCase(currentChar))
                 this.lastMolecule.modifyAtomName(currentChar);
         }
+        this.originalReaction = this.toString();
     };
     Reaction.prototype.getSystemOfLinearEquations = function () {
         var e_2, _a, e_3, _b, e_4, _c;
@@ -265,33 +290,76 @@ var Reaction = /** @class */ (function () {
         return new SystemOfEquations(equations);
     };
     Reaction.prototype.solve = function (showSteps) {
+        var e_5, _a;
         var sol = this.getSystemOfLinearEquations();
         if (showSteps) {
             console.log(sol.toString());
         }
         var solutions = sol.solve();
+        try {
+            for (var _b = __values(sol.getVariables()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var key = _c.value;
+                var solutionForKey = solutions[key];
+                if (solutionForKey === undefined || solutionForKey === 0) {
+                    return new Solution(this, this.parsingError, true);
+                }
+            }
+        }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_5) throw e_5.error; }
+        }
         if (Object.keys(solutions).length === 0) {
-            return "No solution found. Sorrryyyy 🥺";
+            return new Solution(this, this.parsingError, true);
         }
         for (var key in solutions) {
             this.idMoleculeMap[key].coefficient *= solutions[key];
         }
-        return this.toString();
+        return new Solution(this, this.parsingError, false);
     };
     return Reaction;
 }());
 export function solve(reaction, showSteps) {
-    var parsed_reaction;
+    var parsed_reaction = new Reaction(reaction);
+    return parsed_reaction.solve(showSteps).toString();
+}
+function testSolving() {
+    var e_6, _a;
+    var cases = [
+        "H2 + O2 = H2O",
+        "C3H6O3 + O2 = H2O + CO2",
+        "NaOH + CO2 = Na2CO3 + H2O",
+        "C8H18 + O2 = CO2 + H2O",
+        "C12H22O11 + H2SO4 = C + H2O + H2SO4",
+        "C3H8 + O2 = CO2 + H2O",
+        "C6H12O6 + O2 = CO2 + H2O",
+        "C7H16 + O2 = CO2 + H2O",
+        "C4H10 + O2 = CO2 + H2O",
+        "C8H18 + O2 = CO2 + H2O",
+        "C3H8O3 + HNO3 = CH3NO3 + CH3COOH + H2O",
+        "C6H5CH3 + KMnO4 = CO2 + H2O + MnO2 + KCl",
+        "C6H5CH3 + Br2 = C6H5CHBr2 + HBr"
+    ];
     try {
-        parsed_reaction = new Reaction(reaction);
-    }
-    catch (error) {
-        console.error(error);
-        if (error instanceof ParsingError) {
-            return "Parsing error: Check your input! 🥺";
+        for (var cases_1 = __values(cases), cases_1_1 = cases_1.next(); !cases_1_1.done; cases_1_1 = cases_1.next()) {
+            var reaction = cases_1_1.value;
+            var reactionObject = new Reaction(reaction);
+            var solution = reactionObject.solve(true);
+            console.log(solution.originalReaction());
+            console.log(solution.toString());
+            console.log("");
         }
     }
-    return parsed_reaction.solve(showSteps);
+    catch (e_6_1) { e_6 = { error: e_6_1 }; }
+    finally {
+        try {
+            if (cases_1_1 && !cases_1_1.done && (_a = cases_1.return)) _a.call(cases_1);
+        }
+        finally { if (e_6) throw e_6.error; }
+    }
 }
-console.log(solve("H2 + O2 = H2O + N", true));
+testSolving();
 //# sourceMappingURL=reaction.js.map

@@ -65,6 +65,10 @@ class Solution {
     isSucess(): boolean {
         return !this.parsingError && !this.hasNoSollution;
     }
+
+    originalReaction(): string {
+        return this.reaction.originalReaction;
+    }
 }
 
 
@@ -155,7 +159,9 @@ class Reaction {
     private currentSide: number = 1;
 
     private moleculePool: Molecule[] = [];
-    private idMoleculeMap: {[key: string]: Molecule} = {}
+    private idMoleculeMap: {[key: string]: Molecule} = {};
+
+    private parsingError: boolean = false;
 
     constructor(reaction: string) {
         this.parse(reaction);
@@ -166,7 +172,10 @@ class Reaction {
     }
 
     private switchToProduct(): void {
-        if (this.currentSide === -1) throw ParsingError;
+        if (this.currentSide === -1) {
+            this.parsingError = true;
+            return
+        }
 
         this.currentSide = -1;
         this.addMolecule();
@@ -180,7 +189,7 @@ class Reaction {
 
         if (this.currentSide === 1) this.educt.push(this.lastMolecule);
         else if (this.currentSide === -1) this.product.push(this.lastMolecule);
-        else throw ParsingError;
+        else this.parsingError = true;
     }
 
     private parse(reaction: string): void {
@@ -237,7 +246,7 @@ class Reaction {
         return new SystemOfEquations(equations);
     }
       
-    solve(showSteps: boolean): string {
+    solve(showSteps: boolean): Solution {
         const sol = this.getSystemOfLinearEquations();
       
         if (showSteps) {
@@ -245,33 +254,57 @@ class Reaction {
         }
       
         const solutions = sol.solve();
-      
+        
+        for (const key of sol.getVariables()) {
+            let solutionForKey = solutions[key];
+            
+            if (solutionForKey === undefined ||  solutionForKey === 0) {
+                return new Solution(this, this.parsingError, true);
+            }
+        }
+
         if (Object.keys(solutions).length === 0) {
-          return "No solution found. Sorrryyyy 🥺";
+          return new Solution(this, this.parsingError, true);
         }
       
         for (const key in solutions) {
           this.idMoleculeMap[key].coefficient *= solutions[key];
         }
       
-        return this.toString();
+        return new Solution(this, this.parsingError, false);
     }     
 }
 
 
 export function solve(reaction: string, showSteps: boolean): string {
-    let parsed_reaction: Reaction;
-    
-    try {
-        parsed_reaction = new Reaction(reaction);
-    } catch(error) {
-        console.error(error);
-        if (error instanceof ParsingError) {
-            return "Parsing error: Check your input! 🥺";
-        }
-    }
-    
-    return parsed_reaction.solve(showSteps)
+    let parsed_reaction: Reaction = new Reaction(reaction);
+    return parsed_reaction.solve(showSteps).toString();
 }
 
-console.log(solve("H2 + O2 = H2O + N", true));
+function testSolving() {
+    const cases: string[] = [
+        "H2 + O2 = H2O",
+        "C3H6O3 + O2 = H2O + CO2",
+        "NaOH + CO2 = Na2CO3 + H2O",
+        "C8H18 + O2 = CO2 + H2O",
+        "C12H22O11 + H2SO4 = C + H2O + H2SO4",
+        "C3H8 + O2 = CO2 + H2O",
+        "C6H12O6 + O2 = CO2 + H2O",
+        "C7H16 + O2 = CO2 + H2O",
+        "C4H10 + O2 = CO2 + H2O",
+        "C8H18 + O2 = CO2 + H2O",
+        "C3H8O3 + HNO3 = CH3NO3 + CH3COOH + H2O",
+        "C6H5CH3 + KMnO4 = CO2 + H2O + MnO2 + KCl",
+        "C6H5CH3 + Br2 = C6H5CHBr2 + HBr"
+    ]
+
+    for (const reaction of cases) {
+        const reactionObject: Reaction = new Reaction(reaction);
+        const solution: Solution = reactionObject.solve(true);
+        console.log(solution.originalReaction());
+        console.log(solution.toString())
+        console.log("");
+    }
+}
+
+testSolving();
