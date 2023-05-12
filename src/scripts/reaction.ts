@@ -235,9 +235,9 @@ class Reaction {
         }
       
         return new SystemOfEquations(equations);
-      }
+    }
       
-      solve(showSteps: boolean): string {
+    solve(showSteps: boolean): string {
         const sol = this.getSystemOfLinearEquations();
       
         if (showSteps) {
