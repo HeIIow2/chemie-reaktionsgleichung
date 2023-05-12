@@ -2,9 +2,10 @@
   "name": "chemie-reaktionsgleichung",
   "version": "1.0.0",
   "description": "A website, to help you with chemistry reaction equations",
-  "main": "index.js",
+  "main": "dist/scripts/runStuff.js",
+  "type": "module",
   "scripts": {
-    "dev": "live-server --port=3000 ./src"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   "homepage": "https://github.com/HeIIow2/chemie-reaktionsgleichung#readme",
   "devDependencies": {
     "browser-sync": "^2.29.1",
+    "esm": "^3.2.25",
     "gulp": "^4.0.2",
     "gulp-connect": "^5.7.0",
     "gulp-sourcemaps": "^3.0.0",

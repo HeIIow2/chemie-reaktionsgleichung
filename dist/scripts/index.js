@@ -9,4 +9,4 @@ form.addEventListener('submit', function (event) {
     console.log(inputReaction);
     result.innerHTML = solve(inputReaction, true);
 });
-//# sourceMappingURL=main.js.map
+//# sourceMappingURL=index.js.map

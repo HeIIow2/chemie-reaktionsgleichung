@@ -43,6 +43,31 @@ function isDigit(str: string): boolean {
 class ParsingError extends Error {}
 
 
+class Solution {
+    reaction: Reaction;
+
+    parsingError: boolean;
+    hasNoSollution: boolean;
+
+    constructor(reaction: Reaction, parsingError: boolean, hasNoSollution: boolean) {
+        this.reaction = reaction;
+        this.parsingError = parsingError;
+        this.hasNoSollution = hasNoSollution;
+    }
+
+    toString(): string {
+        if (this.parsingError) return "Maybe check your input(?) 🥺";
+        if (this.hasNoSollution) return "No solution found. I'm soooooryyyy!! 🥺"
+
+        return this.reaction.toString();
+    }
+
+    isSucess(): boolean {
+        return !this.parsingError && !this.hasNoSollution;
+    }
+}
+
+
 class Atom {
     name: string;
     count: number
@@ -121,6 +146,8 @@ class Molecule {
 }
 
 class Reaction {
+    originalReaction: string;
+
     educt: Molecule[] = [];
     product: Molecule[] = [];
 
@@ -180,6 +207,8 @@ class Reaction {
             else if (isAlpha(currentChar) && isUpperCase(currentChar)) this.lastMolecule.addAtom(currentChar);
             else if (isAlpha(currentChar) && isLowerCase(currentChar)) this.lastMolecule.modifyAtomName(currentChar);
         }
+
+        this.originalReaction = this.toString();
     }
 
     getSystemOfLinearEquations(): SystemOfEquations {
@@ -244,3 +273,5 @@ export function solve(reaction: string, showSteps: boolean): string {
     
     return parsed_reaction.solve(showSteps)
 }
+
+console.log(solve("H2 + O2 = H2O + N", true));

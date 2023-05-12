@@ -1,14 +1,15 @@
 {
-    "compilerOptions": {
-      "target": "es5",
-      "module": "ES6",
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "sourceMap": true,
-      "downlevelIteration": true
-    },
-    "include": [
-      "./src/**/*.ts"
-    ]
-  }
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "target": "es5",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "downlevelIteration": true
+  },
+  "include": [
+    "./src/**/*.ts"
+  ]
+}
   
