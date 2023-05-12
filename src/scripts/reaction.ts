@@ -206,9 +206,9 @@ class Reaction {
         }
       
         return new SystemOfEquations(equations);
-      }
+    }
       
-      solve(showSteps: boolean): string {
+    solve(showSteps: boolean): string {
         const sol = this.getSystemOfLinearEquations();
       
         if (showSteps) {
@@ -244,3 +244,5 @@ export function solve(reaction: string, showSteps: boolean): string {
     
     return parsed_reaction.solve(showSteps)
 }
+
+console.log(solve("H2 + O2 = H2O + N", true));
