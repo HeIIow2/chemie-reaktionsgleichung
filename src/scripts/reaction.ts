@@ -338,7 +338,8 @@ function testSolving(override: string = "") {
         "C3H8O3 + HNO3 = CH3NO3 + CH3COOH + H2O",
         "C6H5CH3 + KMnO4 = CO2 + H2O + MnO2 + KCl",
         "C6H5CH3 + Br2 = C6H5CHBr2 + HBr",
-        "C₇H₈ + Br₂ ⟶ C₇H₆Br₂ + HBr"
+        "C₇H₈ + Br₂ ⟶ C₇H₆Br₂ + HBr",
+        "Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O"
     ]
 
     if (override !== "") {
@@ -355,4 +356,6 @@ function testSolving(override: string = "") {
 }
 
 // testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
-testSolving("C₁₂H₂₂O₁₁ + H₂SO₄ ⟶ C + H₂O + H₂SO₄")
+// testSolving("C₁₂H₂₂O₁₁ + H₂SO₄ ⟶ C + H₂O + H₂SO₄")
+
+testSolving();
