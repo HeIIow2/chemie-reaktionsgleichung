@@ -1,3 +1,21 @@
+export class LgsResult {
+    lgsHistory: Equation[][];
+    solution: {[key: string]: number};
+
+    constructor(lgsHistory: Equation[][], solution: {[key: string]: number}) {
+        this.lgsHistory = lgsHistory;
+        this.solution = solution;
+    }
+
+    toString(): string {
+        return this.lgsHistory.map((lgs) => {
+            return lgs.map((equation) => {
+                return equation.toString()
+            }).join("\n")}).join("\n\n")
+    }
+}
+
+
 class Substitution {
     key: string;
     substitute: Equation;
@@ -13,15 +31,15 @@ class Substitution {
           .join(" + ")}`;
     }
     
-    newSolution(current_solution: { [key: string]: number }): number | undefined {
+    newSolution(currentSolution: { [key: string]: number }): number | undefined {
         let possible_solution = 0;
 
         for (const [key, value] of Object.entries(this.substitute.equation)) {
-            if (!(key in current_solution)) {
-            return undefined;
+            if (!(key in currentSolution)) {
+                return undefined;
             }
 
-            possible_solution += value * current_solution[key];
+            possible_solution += value * currentSolution[key];
         }
 
         if (possible_solution === 0) return undefined
@@ -222,23 +240,49 @@ export class SystemOfEquations {
         return true;
     }
     
-    solve(): {[key: string]: number} {
+    solve(): LgsResult {
+        const lgsHistory: Equation[][] = [
+            this.equationList.slice(),
+        ];
+
         let iteration = 0;
         while (!this.isSimplified() && iteration < 200) {
             this.substituteSmallest();
 
+            lgsHistory.push(this.equationList.slice());
             iteration++;
         }
 
         let solutions: {[key: string]: number} = {};
+        
+        const iterations = this.getVariables().length;
+        let inventedKeys: Set<string> = new Set();
 
-        for (let n = 0; n < this.getVariables().length; n++) {
+        for (let n = 0; n < iterations; n++) {
             // set the first key to 1
             const variables = this.getVariables();
-            solutions = {[variables[0]]: 1};
+            
+            let yetToInvent: boolean = true;
+            for (const solved in solutions) {
+                if (!(solved in inventedKeys)) {
+                    inventedKeys.add(solved);
+                    yetToInvent = false;
+                }
+            }
+
+            let variableToIter = variables.slice();
+            
+            if (!(variables[0] in solutions) && yetToInvent) {
+                inventedKeys.add(variables[0])
+                solutions[variables[0]] = 1;
+
+                variableToIter = variables.slice(1);
+            }
 
             // substitute back from the one key set
-            for (const variable of variables.slice(1)) {
+            for (const variable of variableToIter) {
+                if (variable in solutions) continue;
+
                 // Choose a variable to set to 1
                 const equations = this.equationList.slice();
                 
@@ -253,20 +297,21 @@ export class SystemOfEquations {
                     const substitution = equationWithVar.solve(variable);
 
                     const newSolution = substitution.newSolution(solutions);
-                    if (newSolution === undefined) {
-                        continue;
-                    }
+                    if (newSolution === undefined) continue;
 
                     if (existingSolution !== undefined && newSolution !== existingSolution) {
-                        return {};
+                        return new LgsResult(lgsHistory, {});
                     }
-
+                    
                     let index = this.equationList.indexOf(equationWithVar);
                     if (index > -1) {
                         this.equationList.splice(index, 1);
                     }
+                    
                     solutions[variable] = newSolution;
                 }
+
+                lgsHistory.push(equations.slice())
             }
         }
 
@@ -283,7 +328,7 @@ export class SystemOfEquations {
             solutions[key] = Math.round(factor * solutions[key]);
         }
 
-        return solutions
+        return new LgsResult(lgsHistory, solutions)
     }
 }
  

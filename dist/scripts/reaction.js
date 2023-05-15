@@ -328,10 +328,13 @@ var Reaction = /** @class */ (function () {
             console.log(sol.toString());
         }
         var solutions = sol.solve();
+        if (showSteps) {
+            console.log(solutions.toString());
+        }
         try {
             for (var _b = __values(sol.getVariables()), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var key = _c.value;
-                var solutionForKey = solutions[key];
+                var solutionForKey = solutions.solution[key];
                 if (solutionForKey === undefined || solutionForKey === 0) {
                     return new Solution(this, this.parsingError, true);
                 }
@@ -344,11 +347,11 @@ var Reaction = /** @class */ (function () {
             }
             finally { if (e_5) throw e_5.error; }
         }
-        if (Object.keys(solutions).length === 0) {
+        if (Object.keys(solutions.solution).length === 0) {
             return new Solution(this, this.parsingError, true);
         }
         for (var key in solutions) {
-            this.idMoleculeMap[key].coefficient *= solutions[key];
+            this.idMoleculeMap[key].coefficient *= solutions.solution[key];
         }
         return new Solution(this, this.parsingError, false);
     };
@@ -358,8 +361,9 @@ export function solve(reaction, showSteps) {
     var parsed_reaction = new Reaction(reaction);
     return parsed_reaction.solve(showSteps);
 }
-function testSolving() {
+function testSolving(override) {
     var e_6, _a;
+    if (override === void 0) { override = ""; }
     var cases = [
         "H2 + O2 = H2O",
         "C3H6O3 + O2 = H2O + CO2",
@@ -376,6 +380,9 @@ function testSolving() {
         "C6H5CH3 + Br2 = C6H5CHBr2 + HBr",
         "C₇H₈ + Br₂ ⟶ C₇H₆Br₂ + HBr"
     ];
+    if (override !== "") {
+        cases = [override];
+    }
     try {
         for (var cases_1 = __values(cases), cases_1_1 = cases_1.next(); !cases_1_1.done; cases_1_1 = cases_1.next()) {
             var reaction = cases_1_1.value;
@@ -394,5 +401,5 @@ function testSolving() {
         finally { if (e_6) throw e_6.error; }
     }
 }
-// testSolving();
+testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
 //# sourceMappingURL=reaction.js.map

@@ -292,21 +292,25 @@ class Reaction {
         }
       
         const solutions = sol.solve();
+
+        if (showSteps) {
+            console.log(solutions.toString());
+        }
         
         for (const key of sol.getVariables()) {
-            let solutionForKey = solutions[key];
+            let solutionForKey = solutions.solution[key];
             
             if (solutionForKey === undefined ||  solutionForKey === 0) {
                 return new Solution(this, this.parsingError, true);
             }
         }
 
-        if (Object.keys(solutions).length === 0) {
+        if (Object.keys(solutions.solution).length === 0) {
           return new Solution(this, this.parsingError, true);
         }
       
         for (const key in solutions) {
-          this.idMoleculeMap[key].coefficient *= solutions[key];
+          this.idMoleculeMap[key].coefficient *= solutions.solution[key];
         }
       
         return new Solution(this, this.parsingError, false);
@@ -319,8 +323,8 @@ export function solve(reaction: string, showSteps: boolean): Solution {
     return parsed_reaction.solve(showSteps);
 }
 
-function testSolving() {
-    const cases: string[] = [
+function testSolving(override: string = "") {
+    let cases: string[] = [
         "H2 + O2 = H2O",
         "C3H6O3 + O2 = H2O + CO2",
         "NaOH + CO2 = Na2CO3 + H2O",
@@ -337,6 +341,10 @@ function testSolving() {
         "C₇H₈ + Br₂ ⟶ C₇H₆Br₂ + HBr"
     ]
 
+    if (override !== "") {
+        cases = [override];
+    }
+
     for (const reaction of cases) {
         const reactionObject: Reaction = new Reaction(reaction);
         const solution: Solution = reactionObject.solve(true);
@@ -346,4 +354,4 @@ function testSolving() {
     }
 }
 
-// testSolving();
+testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");

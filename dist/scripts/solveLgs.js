@@ -36,6 +36,21 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+var LgsResult = /** @class */ (function () {
+    function LgsResult(lgsHistory, solution) {
+        this.lgsHistory = lgsHistory;
+        this.solution = solution;
+    }
+    LgsResult.prototype.toString = function () {
+        return this.lgsHistory.map(function (lgs) {
+            return lgs.map(function (equation) {
+                return equation.toString();
+            }).join("\n");
+        }).join("\n\n");
+    };
+    return LgsResult;
+}());
+export { LgsResult };
 var Substitution = /** @class */ (function () {
     function Substitution(key, substitute) {
         this.key = key;
@@ -49,16 +64,16 @@ var Substitution = /** @class */ (function () {
         })
             .join(" + "));
     };
-    Substitution.prototype.newSolution = function (current_solution) {
+    Substitution.prototype.newSolution = function (currentSolution) {
         var e_1, _a;
         var possible_solution = 0;
         try {
             for (var _b = __values(Object.entries(this.substitute.equation)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var _d = __read(_c.value, 2), key = _d[0], value = _d[1];
-                if (!(key in current_solution)) {
+                if (!(key in currentSolution)) {
                     return undefined;
                 }
-                possible_solution += value * current_solution[key];
+                possible_solution += value * currentSolution[key];
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -269,26 +284,46 @@ var SystemOfEquations = /** @class */ (function () {
         return true;
     };
     SystemOfEquations.prototype.solve = function () {
-        var _a, e_6, _b, e_7, _c;
+        var e_6, _a, e_7, _b;
+        var lgsHistory = [
+            this.equationList.slice(),
+        ];
         var iteration = 0;
         while (!this.isSimplified() && iteration < 200) {
             this.substituteSmallest();
+            lgsHistory.push(this.equationList.slice());
             iteration++;
         }
         var solutions = {};
-        for (var n = 0; n < this.getVariables().length; n++) {
+        var iterations = this.getVariables().length;
+        var inventedKeys = new Set();
+        for (var n = 0; n < iterations; n++) {
             // set the first key to 1
             var variables = this.getVariables();
-            solutions = (_a = {}, _a[variables[0]] = 1, _a);
+            var yetToInvent = true;
+            for (var solved in solutions) {
+                if (!(solved in inventedKeys)) {
+                    inventedKeys.add(solved);
+                    yetToInvent = false;
+                }
+            }
+            var variableToIter = variables.slice();
+            if (!(variables[0] in solutions) && yetToInvent) {
+                inventedKeys.add(variables[0]);
+                solutions[variables[0]] = 1;
+                variableToIter = variables.slice(1);
+            }
             try {
                 // substitute back from the one key set
-                for (var _d = (e_6 = void 0, __values(variables.slice(1))), _e = _d.next(); !_e.done; _e = _d.next()) {
-                    var variable = _e.value;
+                for (var variableToIter_1 = (e_6 = void 0, __values(variableToIter)), variableToIter_1_1 = variableToIter_1.next(); !variableToIter_1_1.done; variableToIter_1_1 = variableToIter_1.next()) {
+                    var variable = variableToIter_1_1.value;
+                    if (variable in solutions)
+                        continue;
                     // Choose a variable to set to 1
                     var equations = this.equationList.slice();
                     try {
-                        for (var _f = (e_7 = void 0, __values(equations.slice())), _g = _f.next(); !_g.done; _g = _f.next()) {
-                            var equationWithVar = _g.value;
+                        for (var _c = (e_7 = void 0, __values(equations.slice())), _d = _c.next(); !_d.done; _d = _c.next()) {
+                            var equationWithVar = _d.value;
                             if (!(variable in equationWithVar.equation)) {
                                 continue;
                             }
@@ -296,11 +331,10 @@ var SystemOfEquations = /** @class */ (function () {
                             // Solve for that variable in one of the equations
                             var substitution = equationWithVar.solve(variable);
                             var newSolution = substitution.newSolution(solutions);
-                            if (newSolution === undefined) {
+                            if (newSolution === undefined)
                                 continue;
-                            }
                             if (existingSolution !== undefined && newSolution !== existingSolution) {
-                                return {};
+                                return new LgsResult(lgsHistory, {});
                             }
                             var index = this.equationList.indexOf(equationWithVar);
                             if (index > -1) {
@@ -312,16 +346,17 @@ var SystemOfEquations = /** @class */ (function () {
                     catch (e_7_1) { e_7 = { error: e_7_1 }; }
                     finally {
                         try {
-                            if (_g && !_g.done && (_c = _f.return)) _c.call(_f);
+                            if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
                         }
                         finally { if (e_7) throw e_7.error; }
                     }
+                    lgsHistory.push(equations.slice());
                 }
             }
             catch (e_6_1) { e_6 = { error: e_6_1 }; }
             finally {
                 try {
-                    if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
+                    if (variableToIter_1_1 && !variableToIter_1_1.done && (_a = variableToIter_1.return)) _a.call(variableToIter_1);
                 }
                 finally { if (e_6) throw e_6.error; }
             }
@@ -337,7 +372,7 @@ var SystemOfEquations = /** @class */ (function () {
         for (var key in solutions) {
             solutions[key] = Math.round(factor * solutions[key]);
         }
-        return solutions;
+        return new LgsResult(lgsHistory, solutions);
     };
     return SystemOfEquations;
 }());
