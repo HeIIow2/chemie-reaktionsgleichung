@@ -266,32 +266,26 @@ export class SystemOfEquations {
             
             let yetToInvent: boolean = true;
             for (const solved in solutions) {
-                if (!(solved in inventedKeys)) {
+                if (!inventedKeys.has(solved)) {
                     inventedKeys.add(solved);
                     yetToInvent = false;
+
+                    break;
                 }
             }
 
             let variableToIter = variables.slice();
             
             if (yetToInvent) {
-                for (const variable in variables) {
+                for (const variable of variables) {
                     if (!(variable in inventedKeys)) {
                         inventedKeys.add(variable)
                         solutions[variable] = 1;
 
-                        break
+                        break;
                     }
                 }
             }
-            /*
-            if (!(variables[0] in solutions) && yetToInvent) {
-                inventedKeys.add(variables[0])
-                solutions[variables[0]] = 1;
-
-                variableToIter = variables.slice(1);
-            }
-            */
 
             // substitute back from the one key set
             for (const variable of variableToIter) {

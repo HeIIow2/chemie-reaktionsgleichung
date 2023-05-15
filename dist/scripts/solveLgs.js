@@ -284,7 +284,7 @@ var SystemOfEquations = /** @class */ (function () {
         return true;
     };
     SystemOfEquations.prototype.solve = function () {
-        var e_6, _a, e_7, _b;
+        var e_6, _a, e_7, _b, e_8, _c;
         var lgsHistory = [
             this.equationList.slice(),
         ];
@@ -304,19 +304,30 @@ var SystemOfEquations = /** @class */ (function () {
                 break;
             var yetToInvent = true;
             for (var solved in solutions) {
-                if (!(solved in inventedKeys)) {
+                if (!inventedKeys.has(solved)) {
                     inventedKeys.add(solved);
                     yetToInvent = false;
+                    break;
                 }
             }
             var variableToIter = variables.slice();
             if (yetToInvent) {
-                for (var variable in variables) {
-                    if (!(variable in inventedKeys)) {
-                        inventedKeys.add(variable);
-                        solutions[variable] = 1;
-                        break;
+                try {
+                    for (var variables_1 = (e_6 = void 0, __values(variables)), variables_1_1 = variables_1.next(); !variables_1_1.done; variables_1_1 = variables_1.next()) {
+                        var variable = variables_1_1.value;
+                        if (!(variable in inventedKeys)) {
+                            inventedKeys.add(variable);
+                            solutions[variable] = 1;
+                            break;
+                        }
                     }
+                }
+                catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                finally {
+                    try {
+                        if (variables_1_1 && !variables_1_1.done && (_a = variables_1.return)) _a.call(variables_1);
+                    }
+                    finally { if (e_6) throw e_6.error; }
                 }
             }
             try {
@@ -329,15 +340,15 @@ var SystemOfEquations = /** @class */ (function () {
                 }
                 */
                 // substitute back from the one key set
-                for (var variableToIter_1 = (e_6 = void 0, __values(variableToIter)), variableToIter_1_1 = variableToIter_1.next(); !variableToIter_1_1.done; variableToIter_1_1 = variableToIter_1.next()) {
+                for (var variableToIter_1 = (e_7 = void 0, __values(variableToIter)), variableToIter_1_1 = variableToIter_1.next(); !variableToIter_1_1.done; variableToIter_1_1 = variableToIter_1.next()) {
                     var variable = variableToIter_1_1.value;
                     if (variable in solutions)
                         continue;
                     // Choose a variable to set to 1
                     var equations = this.equationList.slice();
                     try {
-                        for (var _c = (e_7 = void 0, __values(equations.slice())), _d = _c.next(); !_d.done; _d = _c.next()) {
-                            var equationWithVar = _d.value;
+                        for (var _d = (e_8 = void 0, __values(equations.slice())), _e = _d.next(); !_e.done; _e = _d.next()) {
+                            var equationWithVar = _e.value;
                             if (!(variable in equationWithVar.equation)) {
                                 continue;
                             }
@@ -357,22 +368,22 @@ var SystemOfEquations = /** @class */ (function () {
                             solutions[variable] = newSolution;
                         }
                     }
-                    catch (e_7_1) { e_7 = { error: e_7_1 }; }
+                    catch (e_8_1) { e_8 = { error: e_8_1 }; }
                     finally {
                         try {
-                            if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
+                            if (_e && !_e.done && (_c = _d.return)) _c.call(_d);
                         }
-                        finally { if (e_7) throw e_7.error; }
+                        finally { if (e_8) throw e_8.error; }
                     }
                     lgsHistory.push(equations.slice());
                 }
             }
-            catch (e_6_1) { e_6 = { error: e_6_1 }; }
+            catch (e_7_1) { e_7 = { error: e_7_1 }; }
             finally {
                 try {
-                    if (variableToIter_1_1 && !variableToIter_1_1.done && (_a = variableToIter_1.return)) _a.call(variableToIter_1);
+                    if (variableToIter_1_1 && !variableToIter_1_1.done && (_b = variableToIter_1.return)) _b.call(variableToIter_1);
                 }
-                finally { if (e_6) throw e_6.error; }
+                finally { if (e_7) throw e_7.error; }
             }
         }
         // find the correct factor
