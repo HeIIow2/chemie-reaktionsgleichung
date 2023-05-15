@@ -294,7 +294,7 @@ class Reaction {
         const solutions = sol.solve();
 
         if (showSteps) {
-            console.log(solutions.toString());
+            // console.log(solutions.toString());
         }
         
         for (const key of sol.getVariables()) {
@@ -309,7 +309,7 @@ class Reaction {
           return new Solution(this, this.parsingError, true);
         }
       
-        for (const key in solutions) {
+        for (const key in solutions.solution) {
           this.idMoleculeMap[key].coefficient *= solutions.solution[key];
         }
       
@@ -354,4 +354,5 @@ function testSolving(override: string = "") {
     }
 }
 
-testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
+// testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
+testSolving("C₁₂H₂₂O₁₁ + H₂SO₄ ⟶ C + H₂O + H₂SO₄")

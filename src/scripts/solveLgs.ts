@@ -261,6 +261,8 @@ export class SystemOfEquations {
         for (let n = 0; n < iterations; n++) {
             // set the first key to 1
             const variables = this.getVariables();
+
+            if (variables.length <= 0) break;
             
             let yetToInvent: boolean = true;
             for (const solved in solutions) {

@@ -300,6 +300,8 @@ var SystemOfEquations = /** @class */ (function () {
         for (var n = 0; n < iterations; n++) {
             // set the first key to 1
             var variables = this.getVariables();
+            if (variables.length <= 0)
+                break;
             var yetToInvent = true;
             for (var solved in solutions) {
                 if (!(solved in inventedKeys)) {

@@ -329,7 +329,7 @@ var Reaction = /** @class */ (function () {
         }
         var solutions = sol.solve();
         if (showSteps) {
-            console.log(solutions.toString());
+            // console.log(solutions.toString());
         }
         try {
             for (var _b = __values(sol.getVariables()), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -350,7 +350,7 @@ var Reaction = /** @class */ (function () {
         if (Object.keys(solutions.solution).length === 0) {
             return new Solution(this, this.parsingError, true);
         }
-        for (var key in solutions) {
+        for (var key in solutions.solution) {
             this.idMoleculeMap[key].coefficient *= solutions.solution[key];
         }
         return new Solution(this, this.parsingError, false);
@@ -401,5 +401,6 @@ function testSolving(override) {
         finally { if (e_6) throw e_6.error; }
     }
 }
-testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
+// testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
+testSolving();
 //# sourceMappingURL=reaction.js.map
