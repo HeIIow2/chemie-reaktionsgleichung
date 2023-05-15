@@ -310,12 +310,24 @@ var SystemOfEquations = /** @class */ (function () {
                 }
             }
             var variableToIter = variables.slice();
-            if (!(variables[0] in solutions) && yetToInvent) {
-                inventedKeys.add(variables[0]);
-                solutions[variables[0]] = 1;
-                variableToIter = variables.slice(1);
+            if (yetToInvent) {
+                for (var variable in variables) {
+                    if (!(variable in inventedKeys)) {
+                        inventedKeys.add(variable);
+                        solutions[variable] = 1;
+                        break;
+                    }
+                }
             }
             try {
+                /*
+                if (!(variables[0] in solutions) && yetToInvent) {
+                    inventedKeys.add(variables[0])
+                    solutions[variables[0]] = 1;
+    
+                    variableToIter = variables.slice(1);
+                }
+                */
                 // substitute back from the one key set
                 for (var variableToIter_1 = (e_6 = void 0, __values(variableToIter)), variableToIter_1_1 = variableToIter_1.next(); !variableToIter_1_1.done; variableToIter_1_1 = variableToIter_1.next()) {
                     var variable = variableToIter_1_1.value;

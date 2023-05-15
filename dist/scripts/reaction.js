@@ -402,5 +402,5 @@ function testSolving(override) {
     }
 }
 // testSolving("Pb + PbO₂ + H₂SO₄ ⟶ PbSO₄ + H₂O");
-testSolving();
+testSolving("C₁₂H₂₂O₁₁ + H₂SO₄ ⟶ C + H₂O + H₂SO₄");
 //# sourceMappingURL=reaction.js.map

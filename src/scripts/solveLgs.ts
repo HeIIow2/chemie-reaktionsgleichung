@@ -274,12 +274,24 @@ export class SystemOfEquations {
 
             let variableToIter = variables.slice();
             
+            if (yetToInvent) {
+                for (const variable in variables) {
+                    if (!(variable in inventedKeys)) {
+                        inventedKeys.add(variable)
+                        solutions[variable] = 1;
+
+                        break
+                    }
+                }
+            }
+            /*
             if (!(variables[0] in solutions) && yetToInvent) {
                 inventedKeys.add(variables[0])
                 solutions[variables[0]] = 1;
 
                 variableToIter = variables.slice(1);
             }
+            */
 
             // substitute back from the one key set
             for (const variable of variableToIter) {
