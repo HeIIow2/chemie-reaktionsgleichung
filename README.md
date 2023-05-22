@@ -1,5 +1,7 @@
 # chemie-reaktionsgleichung
 
+![logo](logo.png)
+
 Ein Programm um Reaktionsgleichungen ausgleichen.
 
 ## Solving a System of Linear Equations using substitution
