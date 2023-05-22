@@ -19,6 +19,7 @@
     /* even darker pink on click */
 
     --padding: 20px;
+    --font-size: 27px;
 }
 
 * {
@@ -29,6 +30,8 @@
 body {
     background-color: var(--secondary-color);
     color: var(--text-color);
+
+    font-family: sans-serif;
 }
 
 
@@ -78,6 +81,7 @@ input[type="text"] {
     border-bottom: 2px solid var(--primary-color);
     background-color: transparent;
     color: var(--text-color);
+    font-size: var(--font-size);
 
     outline: none;
 
@@ -90,7 +94,7 @@ button[type="submit"] {
     color: var(--text-color);
     border: none;
     border-radius: 5px;
-    font-size: 18px;
+    font-size: var(--font-size);
     cursor: pointer;
 } 
 
@@ -119,8 +123,7 @@ button[type="submit"] {
 #result {
     text-align: left;
 
-    font-family: 'Roboto';
-    font-size: 30px;
+    font-size: var(--font-size);
     margin-bottom: 10px;
     /* Add margin-bottom to give space between label and input */
     color: var(--primary-color);
